@@ -1,0 +1,32 @@
+
+version: "3.3"
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=foodgram
+      - POSTGRES_USER=foodgram
+      - POSTGRES_PASSWORD=foodgram
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  backend:
+    build:
+      context: ..                      # репо-корень, чтобы «backend/», «data/», «infra/» были в контексте
+      dockerfile: backend/Dockerfile   # берём именно этот Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - static_value:/app/staticfiles      # тут Django collectstatic складывает admin стили
+      - media_value:/app/media
+    ports:
+      - "8000:8000"
+
+
+volumes:
+  pgdata:
+  static_value:
+  media_value:
